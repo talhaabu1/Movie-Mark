@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Delete, Edit, EllipsisIcon, Trash, Trash2 } from 'lucide-react';
+import { Edit, EllipsisIcon, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {

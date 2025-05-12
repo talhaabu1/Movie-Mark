@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { CheckIcon, ChevronDownIcon, X, XIcon } from 'lucide-react';
+import { CheckIcon, ChevronDownIcon, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
