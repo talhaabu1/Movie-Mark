@@ -3,7 +3,7 @@ import Component from '@/components/comp-229';
 import RoundedCornersTableDemo from '@/components/customized/table/table-04';
 import { Separator } from '@/components/indie/separator';
 import { Button } from '@/components/ui/button';
-import { CreativeCommons, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 
 const Page = () => {
   return (
