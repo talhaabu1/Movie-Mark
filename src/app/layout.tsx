@@ -7,7 +7,7 @@ import { ViewTransitions } from 'next-view-transitions';
 
 export const metadata: Metadata = {
   title: 'Movie Mark',
-  description: 'Movie Mark is a movie and series mark app',
+  description: 'Movie Mark is a movie and series mark web-app',
 };
 
 const Layout = ({ children }: { children: ReactNode }) => {
