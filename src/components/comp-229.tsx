@@ -140,7 +140,7 @@ export default function Component() {
           <Command>
             <CommandInput placeholder="Movie Name..." />
             <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandEmpty>No Movie found.</CommandEmpty>
               <CommandGroup>
                 {frameworks.map((framework) => (
                   <CommandItem

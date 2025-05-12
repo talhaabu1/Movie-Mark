@@ -37,8 +37,8 @@ export default function Component1() {
         <SelectContent>
           {[
             { value: '1', label: 'ALL', color: 'text-gray-500' },
-            { value: '2', label: 'WATCHING', color: 'text-blue-500' },
-            { value: '3', label: 'WATCHED', color: 'text-emerald-600' },
+            { value: '2', label: 'WATCHING', color: 'text-sky-500' },
+            { value: '3', label: 'WATCHED', color: 'text-emerald-500' },
             { value: '4', label: 'PLAN TO WATCH', color: 'text-red-500' },
             { value: '5', label: 'COMING SOON', color: 'text-amber-500' },
           ].map(({ value, label, color }) => (

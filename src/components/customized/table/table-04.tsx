@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Table,
   TableBody,
@@ -15,6 +17,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
+import { cn, getStatusColor } from '@/lib/utils';
 
 const products = [
   {
@@ -41,11 +50,66 @@ const products = [
     part: 5,
     status: 'PLAN TO WATCH',
   },
+  {
+    id: 105,
+    name: 'Super Hero',
+    part: 6,
+    status: 'COMING SOON',
+  },
+  {
+    id: 106,
+    name: 'Super Man',
+    part: 7,
+    status: 'COMING SOON',
+  },
+  {
+    id: 107,
+    name: 'Super Woman',
+    part: 8,
+    status: 'PLAN TO WATCH',
+  },
+  {
+    id: 108,
+    name: 'Super Girl',
+    part: 9,
+    status: 'COMING SOON',
+  },
+  {
+    id: 109,
+    name: 'Super Boy',
+    part: 10,
+    status: 'WATCHING',
+  },
+  {
+    id: 110,
+    name: 'Super Woman shadow',
+    part: 11,
+    status: 'WATCHED',
+  },
 ];
+
+// function ProductNameCell({ name }: { name: string }) {
+//   const isMobile = useMediaQuery('(max-width: 767px)');
+
+//   if (name.length <= 10) return <span>{name}</span>;
+
+//   if (isMobile) {
+//     return (
+//       <Popover>
+//         <PopoverTrigger asChild>
+//           <button className="text-left">{name.slice(0, 10)}...</button>
+//         </PopoverTrigger>
+//         <PopoverContent className="max-w-xs">{name}</PopoverContent>
+//       </Popover>
+//     );
+//   }
+
+//   return <span>{name}</span>; // Desktop full show
+// }
 
 export default function RoundedCornersTableDemo() {
   return (
-    <div className=" mx-1">
+    <div className="mx-1">
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
@@ -61,9 +125,33 @@ export default function RoundedCornersTableDemo() {
             {products.map((product) => (
               <TableRow key={product.id} className="odd:bg-muted/50">
                 <TableCell className="pl-4">{product.id}</TableCell>
-                <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell>
+                  <div className="md:hidden">
+                    {product.name.length > 10 ? (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="text-left">
+                            {product.name.slice(0, 10)}...
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-fit">
+                          {product.name}
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
+                      product.name
+                    )}
+                  </div>
+                  <div className="hidden md:block">{product.name}</div>
+                </TableCell>
                 <TableCell>{product.part}</TableCell>
-                <TableCell>{product.status}</TableCell>
+                <TableCell>
+                  <Badge
+                    className={cn('rounded', getStatusColor(product.status))}
+                    variant="outline">
+                    {product.status}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

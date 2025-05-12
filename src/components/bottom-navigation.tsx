@@ -22,7 +22,7 @@ const BottomNavigation = () => {
   };
 
   return (
-    <ul className="fixed bottom-0 left-0 right-0 mx-auto flex w-full max-w-md justify-evenly bg-primary/10 py-2 rounded-t-lg">
+    <ul className="fixed bottom-0 left-0 right-0 mx-auto flex w-full max-w-md justify-evenly bg-muted py-2 rounded-t-lg">
       {menuList.map((item, index) => {
         const isActive = pathname === item.href;
 
