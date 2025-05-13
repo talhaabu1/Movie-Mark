@@ -1,16 +1,22 @@
+'use client';
+
 import Component1 from '@/components/comp-220';
-import Component from '@/components/comp-229';
 import Pagination1 from '@/components/comp-456';
 import RoundedCornersTableDemo from '@/components/customized/table/table-04';
 import { Separator } from '@/components/indie/separator';
+import Search from '@/components/search';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
+import { useState } from 'react';
 
 const Page = () => {
+  const [search, setSearch] = useState('');
+
+  console.log(search, ':Search');
   return (
     <div>
       <section className=" flex items-center gap-x-2 mt-3 mx-2 md:mx-0">
-        <Component />
+        <Search onSelect={setSearch} />
         <Component1 />
         <Button variant="outline" className="aspect-square max-sm:p-0">
           <PlusIcon

@@ -87,7 +87,11 @@ const frameworks = [
   },
 ];
 
-export default function Component() {
+interface Props {
+  onSelect: (value: string) => void;
+}
+
+const Search = ({ onSelect }: Props) => {
   const id = useId();
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
@@ -147,7 +151,10 @@ export default function Component() {
                     key={framework.value}
                     value={framework.value}
                     onSelect={(currentValue) => {
-                      setValue(currentValue === value ? '' : currentValue);
+                      const newValue =
+                        currentValue === value ? '' : currentValue;
+                      onSelect(newValue);
+                      setValue(newValue);
                       setOpen(false);
                     }}>
                     {framework.label}
@@ -163,4 +170,6 @@ export default function Component() {
       </Popover>
     </div>
   );
-}
+};
+
+export default Search;
