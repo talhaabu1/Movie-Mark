@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Edit, EllipsisIcon, Pencil, Trash2 } from 'lucide-react';
+import { EllipsisIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -25,7 +25,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn, getStatusColor } from '@/lib/utils';
 import MovieDialog from '@/app/(root)/movie/movie-dialog';
-import { useState, type SetStateAction } from 'react';
+import { useState } from 'react';
 
 const products = [
   {
@@ -210,7 +210,10 @@ export default function RoundedCornersTableDemo() {
           part: selectedProduct.part,
           status: selectedProduct.status,
         }}
-        onSubmit={(data, { reset }) => {}}
+        onSubmit={(data, { reset }) => {
+          console.log(data);
+          reset();
+        }}
       />
     </div>
   );
