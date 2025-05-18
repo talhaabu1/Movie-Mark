@@ -17,13 +17,15 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { PlusIcon } from 'lucide-react';
-import { Separator } from '../../../components/indie/separator';
-import StatusSelect from '../../../components/status-select';
+import { Separator } from '@/components/indie/separator';
+import StatusSelect from '@/components/status-select';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   movie: z.string().min(1, 'Movie name is required'),
@@ -31,40 +33,82 @@ const formSchema = z.object({
   status: z.string().min(1, 'Status is required'),
 });
 
-type FormData = z.infer<typeof formSchema>;
+export type FormData = z.infer<typeof formSchema>;
 
-export default function MovieDialog() {
+type MovieDialogProps = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onSubmit: (data: FormData, helpers: { reset: () => void }) => void;
+  mode?: 'create' | 'edit';
+  defaultValues?: Partial<FormData>;
+  trigger?: React.ReactNode;
+};
+
+export default function MovieDialog({
+  open,
+  setOpen,
+  onSubmit,
+  mode = 'create',
+  defaultValues = {},
+  trigger,
+}: MovieDialogProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       movie: '',
       part: 1,
       status: '',
+      ...defaultValues,
     },
   });
 
-  const onSubmit = (values: FormData) => {
-    console.log(values);
+  useEffect(() => {
+    if (open && defaultValues && mode === 'edit') {
+      form.reset({
+        movie: defaultValues.movie ?? '',
+        part: defaultValues.part ?? 1,
+        status: defaultValues.status ?? '',
+      });
+    }
+  }, [open, defaultValues, form, mode]);
+
+  const handleSubmit = (values: FormData) => {
+    onSubmit(values, {
+      reset: () => {
+        form.reset();
+        setOpen(false);
+      },
+    });
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="aspect-square max-sm:p-0">
-          <PlusIcon className="opacity-60 sm:-ms-1" size={16} />
-          <span className="max-sm:sr-only">Add new</span>
-        </Button>
+        {trigger ?? (
+          <Button variant="outline" className="aspect-square max-sm:p-0">
+            <PlusIcon className="opacity-60 sm:-ms-1" size={16} />
+            <span className="max-sm:sr-only">Add new</span>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="sm:text-center">Add Movie</DialogTitle>
+          <DialogTitle className="sm:text-center">
+            {mode === 'edit' ? 'Edit Movie' : 'Add Movie'}
+          </DialogTitle>
+          <DialogDescription className=" text-center">
+            {mode === 'edit'
+              ? 'Update your movie info'
+              : 'Add a movie to your watchlist'}
+          </DialogDescription>
+
           <Separator gradient className="mt-1" />
         </DialogHeader>
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-5 pt-2">
             <FormField
               control={form.control}
@@ -116,7 +160,7 @@ export default function MovieDialog() {
             />
 
             <Button type="submit" className="w-full">
-              Submit
+              {mode === 'edit' ? 'Update' : 'Submit'}
             </Button>
           </form>
         </Form>

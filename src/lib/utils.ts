@@ -12,7 +12,7 @@ export function getStatusColor(status: string) {
     case 'WATCHED':
       return 'text-emerald-500';
     case 'PLAN TO WATCH':
-      return 'text-red-500';
+      return 'text-indigo-400';
     case 'COMING SOON':
       return 'text-amber-500';
     default:

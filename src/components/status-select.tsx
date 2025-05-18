@@ -28,7 +28,7 @@ export const STATUS_OPTIONS = [
   { value: 'ALL', label: 'ALL', color: 'text-gray-500' },
   { value: 'WATCHING', label: 'WATCHING', color: 'text-sky-500' },
   { value: 'WATCHED', label: 'WATCHED', color: 'text-emerald-500' },
-  { value: 'PLAN TO WATCH', label: 'PLAN TO WATCH', color: 'text-red-500' },
+  { value: 'PLAN TO WATCH', label: 'PLAN TO WATCH', color: 'text-indigo-400' },
   { value: 'COMING SOON', label: 'COMING SOON', color: 'text-amber-500' },
 ];
 

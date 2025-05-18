@@ -11,6 +11,7 @@ import MovieDialog from './movie-dialog';
 const Page = () => {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('ALL');
+  const [open, setOpen] = useState(false);
   console.log(search);
   return (
     <div>
@@ -22,7 +23,15 @@ const Page = () => {
           onChange={setStatus}
           allOptions
         />
-        <MovieDialog />
+        <MovieDialog
+          open={open}
+          setOpen={setOpen}
+          mode="create"
+          onSubmit={(data, { reset }) => {
+            console.log(data);
+            reset();
+          }}
+        />
       </section>
       <Separator gradient className="my-3" />
       <RoundedCornersTableDemo />

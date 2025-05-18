@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Edit, EllipsisIcon, Trash2 } from 'lucide-react';
+import { Edit, EllipsisIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { cn, getStatusColor } from '@/lib/utils';
+import MovieDialog from '@/app/(root)/movie/movie-dialog';
+import { useState, type SetStateAction } from 'react';
 
 const products = [
   {
@@ -107,7 +109,25 @@ const products = [
 //   return <span>{name}</span>; // Desktop full show
 // }
 
+interface SelectedProductType {
+  name: string;
+  part: number;
+  status: string;
+}
+
 export default function RoundedCornersTableDemo() {
+  const [open, setOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>({
+    name: '',
+    part: 0,
+    status: '',
+  });
+
+  const handleEditClick = (product: SelectedProductType) => {
+    setSelectedProduct(product);
+    setOpen(true);
+  };
+
   return (
     <div className="mx-1 md:mx-0">
       <div className="w-full border rounded-md overflow-hidden">
@@ -164,8 +184,9 @@ export default function RoundedCornersTableDemo() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem>
-                        <Edit size={16} /> <span>Edit</span>
+                      <DropdownMenuItem
+                        onSelect={() => handleEditClick(product)}>
+                        <Pencil size={16} /> <span>Edit</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem className=" text-destructive">
                         <Trash2 size={16} /> <span>Delete</span>
@@ -178,6 +199,19 @@ export default function RoundedCornersTableDemo() {
           </TableBody>
         </Table>
       </div>
+      {/* Dialog is rendered outside dropdown menu */}
+      <MovieDialog
+        mode="edit"
+        trigger={<p className="hidden">hidden</p>}
+        open={open}
+        setOpen={setOpen}
+        defaultValues={{
+          movie: selectedProduct.name,
+          part: selectedProduct.part,
+          status: selectedProduct.status,
+        }}
+        onSubmit={(data, { reset }) => {}}
+      />
     </div>
   );
 }
