@@ -109,7 +109,7 @@ const products = [
 
 export default function RoundedCornersTableDemo() {
   return (
-    <div className="mx-1">
+    <div className="mx-1 md:mx-0">
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
           <TableHeader>

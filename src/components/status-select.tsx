@@ -1,5 +1,6 @@
-import { useId } from 'react';
+'use client';
 
+import { useId } from 'react';
 import {
   Select,
   SelectContent,
@@ -23,11 +24,36 @@ function StatusDot({ className }: { className?: string }) {
   );
 }
 
-export default function Component1() {
+export const STATUS_OPTIONS = [
+  { value: 'ALL', label: 'ALL', color: 'text-gray-500' },
+  { value: 'WATCHING', label: 'WATCHING', color: 'text-sky-500' },
+  { value: 'WATCHED', label: 'WATCHED', color: 'text-emerald-500' },
+  { value: 'PLAN TO WATCH', label: 'PLAN TO WATCH', color: 'text-red-500' },
+  { value: 'COMING SOON', label: 'COMING SOON', color: 'text-amber-500' },
+];
+
+type StatusSelectProps = {
+  value?: string;
+  onChange?: (value: string) => void;
+  className?: string;
+  allOptions?: boolean;
+};
+
+export default function StatusSelect({
+  value,
+  onChange,
+  className,
+  allOptions = false,
+}: StatusSelectProps) {
   const id = useId();
+
+  const filteredOptions = allOptions
+    ? STATUS_OPTIONS
+    : STATUS_OPTIONS.filter((option) => option.value !== 'ALL');
+
   return (
-    <div className="*:not-first:mt-2 flex-1 basis-0">
-      <Select defaultValue="1">
+    <div className={className}>
+      <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           id={id}
           className="[&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span]:w-full [&>span]:truncate">
@@ -35,13 +61,7 @@ export default function Component1() {
         </SelectTrigger>
 
         <SelectContent>
-          {[
-            { value: '1', label: 'ALL', color: 'text-gray-500' },
-            { value: '2', label: 'WATCHING', color: 'text-sky-500' },
-            { value: '3', label: 'WATCHED', color: 'text-emerald-500' },
-            { value: '4', label: 'PLAN TO WATCH', color: 'text-red-500' },
-            { value: '5', label: 'COMING SOON', color: 'text-amber-500' },
-          ].map(({ value, label, color }) => (
+          {filteredOptions.map(({ value, label, color }) => (
             <SelectItem key={value} value={value}>
               <span className="flex items-center gap-2 w-full truncate">
                 <StatusDot className={color} />
