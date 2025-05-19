@@ -1,12 +1,12 @@
 'use client';
 
-import Pagination1 from '@/components/comp-454';
 import RoundedCornersTableDemo from '@/components/customized/table/table-04';
 import { Separator } from '@/components/indie/separator';
 import Search from '@/components/search';
 import StatusSelect from '@/components/status-select';
 import { useState } from 'react';
 import MovieDialog from './movie-dialog';
+import Component from '@/components/comp-456';
 
 const Page = () => {
   const [search, setSearch] = useState('');
@@ -37,7 +37,7 @@ const Page = () => {
       <RoundedCornersTableDemo />
       <Separator gradient className="my-3" />
       <div className="mx-1 md:mx-0">
-        <Pagination1 currentPage={5} totalPages={10} />
+        <Component currentPage={5} totalPages={10} />
       </div>
     </div>
   );
