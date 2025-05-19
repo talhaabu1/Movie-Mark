@@ -26,6 +26,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn, getStatusColor } from '@/lib/utils';
 import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
+import AlertDeleteDialog from '@/components/alert-dialog';
+import { toast } from 'sonner';
 
 const products = [
   {
@@ -116,7 +118,12 @@ interface SelectedProductType {
 }
 
 export default function RoundedCornersTableDemo() {
-  const [open, setOpen] = useState(false);
+  const [movieDialog, setMovieDialog] = useState(false);
+  const [alertDialog, setAlertDialog] = useState(false);
+  const [alertDialogInfo, setAlertDialogInfo] = useState<{
+    id: number;
+    movie: string;
+  }>({ id: 0, movie: '' });
   const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>({
     name: '',
     part: 0,
@@ -125,86 +132,100 @@ export default function RoundedCornersTableDemo() {
 
   const handleEditClick = (product: SelectedProductType) => {
     setSelectedProduct(product);
-    setOpen(true);
+    setMovieDialog(true);
+  };
+
+  const handleDeleteClick = ({ id, movie }: { id: number; movie: string }) => {
+    setAlertDialogInfo({ id, movie });
+    setAlertDialog(true);
   };
 
   return (
-    <div className="mx-1 md:mx-0">
-      <div className="w-full border rounded-md overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="pl-4">ID</TableHead>
-              <TableHead>Movie</TableHead>
-              <TableHead>Part</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id} className="odd:bg-muted/50">
-                <TableCell className="pl-4">{product.id}</TableCell>
-                <TableCell>
-                  <div className="md:hidden">
-                    {product.name.length > 10 ? (
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button className="text-left">
-                            {product.name.slice(0, 10)}...
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-fit">
-                          {product.name}
-                        </PopoverContent>
-                      </Popover>
-                    ) : (
-                      product.name
-                    )}
-                  </div>
-                  <div className="hidden md:block">{product.name}</div>
-                </TableCell>
-                <TableCell>{product.part}</TableCell>
-                <TableCell>
-                  <Badge
-                    className={cn('rounded', getStatusColor(product.status))}
-                    variant="outline">
-                    {product.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="rounded-full shadow-none"
-                        aria-label="Open edit menu">
-                        <EllipsisIcon size={16} aria-hidden="true" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onSelect={() => handleEditClick(product)}>
-                        <Pencil size={16} /> <span>Edit</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className=" text-destructive">
-                        <Trash2 size={16} /> <span>Delete</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+    <>
+      <div className="mx-1 md:mx-0">
+        <div className="w-full border rounded-md overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="pl-4">ID</TableHead>
+                <TableHead>Movie</TableHead>
+                <TableHead>Part</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow key={product.id} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{product.id}</TableCell>
+                  <TableCell>
+                    <div className="md:hidden">
+                      {product.name.length > 10 ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="text-left">
+                              {product.name.slice(0, 10)}...
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-fit">
+                            {product.name}
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        product.name
+                      )}
+                    </div>
+                    <div className="hidden md:block">{product.name}</div>
+                  </TableCell>
+                  <TableCell>{product.part}</TableCell>
+                  <TableCell>
+                    <Badge
+                      className={cn('rounded', getStatusColor(product.status))}
+                      variant="outline">
+                      {product.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="rounded-full shadow-none"
+                          aria-label="Open edit menu">
+                          <EllipsisIcon size={16} aria-hidden="true" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onSelect={() => handleEditClick(product)}>
+                          <Pencil size={16} /> <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() =>
+                            handleDeleteClick({
+                              id: product.id,
+                              movie: product.name,
+                            })
+                          }
+                          className=" text-destructive">
+                          <Trash2 size={16} /> <span>Delete</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       {/* Dialog is rendered outside dropdown menu */}
       <MovieDialog
         mode="edit"
         trigger={<p className="hidden">hidden</p>}
-        open={open}
-        setOpen={setOpen}
+        open={movieDialog}
+        setOpen={setMovieDialog}
         defaultValues={{
           movie: selectedProduct.name,
           part: selectedProduct.part,
@@ -215,6 +236,26 @@ export default function RoundedCornersTableDemo() {
           reset();
         }}
       />
-    </div>
+      {/* Dialog is rendered outside dropdown menu */}
+      <AlertDeleteDialog
+        title="Are you sure?"
+        description={
+          <p className=" text-pretty">
+            Are you sure you want to delete the movie{' '}
+            <span className="text-destructive">
+              &quot;{alertDialogInfo.movie}&quot;
+            </span>
+            ?
+          </p>
+        }
+        open={alertDialog}
+        setOpen={setAlertDialog}
+        onConfirm={() => {
+          toast.error('Movie deleted successfully', {
+            className: 'font-mono',
+          });
+        }}
+      />
+    </>
   );
 }

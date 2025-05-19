@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ViewTransitions } from 'next-view-transitions';
 import { SessionProvider } from 'next-auth/react';
 import { auth } from '@/auth';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: 'Movie Mark',
@@ -21,6 +22,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
           <ThemeProvider attribute="class" defaultTheme="dark">
             <SessionProvider session={session}>{children}</SessionProvider>
           </ThemeProvider>
+          <Toaster />
         </body>
       </html>
     </ViewTransitions>
