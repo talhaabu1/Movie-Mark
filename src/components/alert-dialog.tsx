@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -49,7 +49,11 @@ export default function AlertDeleteDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>No</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>Yes</AlertDialogAction>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className={buttonVariants({ variant: 'destructive' })}>
+            Yes
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
