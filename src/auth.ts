@@ -31,9 +31,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             .returning({ id: usersTable.id })
             .then((res) => res[0]);
 
-          user.id = insertedUser.id;
+          user.id = String(insertedUser.id);
         } else {
-          user.id = existingUser.id;
+          user.id = String(existingUser.id);
         }
 
         return true;

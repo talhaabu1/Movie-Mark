@@ -48,10 +48,13 @@ export default function AlertDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>No</AlertDialogCancel>
+          <AlertDialogCancel
+            className={buttonVariants({ size: 'sm', variant: 'outline' })}>
+            No
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className={buttonVariants({ variant: 'destructive' })}>
+            className={buttonVariants({ variant: 'destructive', size: 'sm' })}>
             Yes
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -7,6 +7,7 @@ import { ViewTransitions } from 'next-view-transitions';
 import { SessionProvider } from 'next-auth/react';
 import { auth } from '@/auth';
 import { Toaster } from '@/components/ui/sonner';
+import TanstackProvider from '@/components/query-client-provider';
 
 export const metadata: Metadata = {
   title: 'Movie Mark',
@@ -19,9 +20,11 @@ const Layout = async ({ children }: { children: ReactNode }) => {
     <ViewTransitions>
       <html lang="en" className={GeistMono.className} suppressHydrationWarning>
         <body>
-          <ThemeProvider attribute="class" defaultTheme="dark">
-            <SessionProvider session={session}>{children}</SessionProvider>
-          </ThemeProvider>
+          <TanstackProvider>
+            <ThemeProvider attribute="class" defaultTheme="dark">
+              <SessionProvider session={session}>{children}</SessionProvider>
+            </ThemeProvider>
+          </TanstackProvider>
           <Toaster />
         </body>
       </html>

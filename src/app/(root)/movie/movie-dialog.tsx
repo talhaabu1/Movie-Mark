@@ -27,8 +27,8 @@ import { Separator } from '@/components/indie/separator';
 import StatusSelect from '@/components/status-select';
 import { useEffect } from 'react';
 
-const formSchema = z.object({
-  movie: z.string().min(1, 'Movie name is required'),
+export const formSchema = z.object({
+  name: z.string().min(1, 'Movie name is required'),
   part: z.coerce.number().min(1, 'Part must be at least 1'),
   status: z.string().min(1, 'Status is required'),
 });
@@ -42,6 +42,7 @@ type MovieDialogProps = {
   mode?: 'create' | 'edit';
   defaultValues?: Partial<FormData>;
   trigger?: React.ReactNode;
+  isLoading?: boolean;
 };
 
 export default function MovieDialog({
@@ -51,11 +52,12 @@ export default function MovieDialog({
   mode = 'create',
   defaultValues = {},
   trigger,
+  isLoading = false,
 }: MovieDialogProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      movie: '',
+      name: '',
       part: 1,
       status: '',
       ...defaultValues,
@@ -65,7 +67,7 @@ export default function MovieDialog({
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
       form.reset({
-        movie: defaultValues.movie ?? '',
+        name: defaultValues.name ?? '',
         part: defaultValues.part ?? 1,
         status: defaultValues.status ?? '',
       });
@@ -112,7 +114,7 @@ export default function MovieDialog({
             className="space-y-5 pt-2">
             <FormField
               control={form.control}
-              name="movie"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Movie</FormLabel>
@@ -159,7 +161,7 @@ export default function MovieDialog({
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button disabled={isLoading} type="submit" className="w-full">
               {mode === 'edit' ? 'Update' : 'Submit'}
             </Button>
           </form>

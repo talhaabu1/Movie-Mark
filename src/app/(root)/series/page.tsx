@@ -1,10 +1,10 @@
-import RoundedCornersTableDemo from '@/components/customized/table/table-04';
 import React from 'react';
+import MovieTable from '../movie/movie-table';
 
 const Page = () => {
   return (
     <div>
-      <RoundedCornersTableDemo />
+      <MovieTable />
     </div>
   );
 };

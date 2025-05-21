@@ -117,7 +117,7 @@ interface SelectedProductType {
   status: string;
 }
 
-export default function RoundedCornersTableDemo() {
+export default function MovieTable() {
   const [movieDialog, setMovieDialog] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [alertDialogInfo, setAlertDialogInfo] = useState<{
@@ -227,7 +227,7 @@ export default function RoundedCornersTableDemo() {
         open={movieDialog}
         setOpen={setMovieDialog}
         defaultValues={{
-          movie: selectedProduct.name,
+          name: selectedProduct.name,
           part: selectedProduct.part,
           status: selectedProduct.status,
         }}
