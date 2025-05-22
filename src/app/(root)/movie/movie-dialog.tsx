@@ -162,7 +162,11 @@ export default function MovieDialog({
             />
 
             <Button disabled={isLoading} type="submit" className="w-full">
-              {mode === 'edit' ? 'Update' : 'Submit'}
+              {isLoading ? (
+                'Loading...'
+              ) : (
+                <>{mode === 'edit' ? 'Update' : 'Submit'}</>
+              )}
             </Button>
           </form>
         </Form>

@@ -15,3 +15,12 @@ export const moviePost = async (movie: MovieData) => {
     throw err;
   }
 };
+
+export const movieGet = async () => {
+  try {
+    const res = await api.get('/movie');
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

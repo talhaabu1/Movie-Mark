@@ -7,12 +7,15 @@ import { useState } from 'react';
 import MovieDialog from './movie-dialog';
 import Component from '@/components/comp-456';
 import MovieTable from './movie-table';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { moviePost, type MovieData } from '@/lib/api/movie';
-import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { GeistMono } from 'geist/font/mono';
 
 const Page = () => {
+  const queryClient = useQueryClient();
+
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('ALL');
   const [open, setOpen] = useState(false);
@@ -23,19 +26,20 @@ const Page = () => {
   const movieMutation = useMutation({
     mutationFn: async (data: MovieData) => moviePost(data),
     onSuccess: () => {
-      toast.success('Movie created successfully!', {
-        className: 'font-mono',
+      queryClient.invalidateQueries({ queryKey: ['movie'] });
+      toast.success('Movie added successfully!', {
+        className: `${GeistMono.className}`,
       });
       setOpen(false);
     },
     onError: (err) => {
-      toast.error('Failed to create movie', {
-        className: 'font-mono',
+      toast.error('Failed to add movie!', {
+        className: `${GeistMono.className}`,
       });
       console.error(err);
     },
   });
-  console.log(movieMutation.data);
+
   return (
     <div>
       <section className=" flex items-center gap-x-2 mt-3 mx-2 md:mx-0">

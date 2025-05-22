@@ -28,69 +28,9 @@ import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-
-const products = [
-  {
-    id: 101,
-    name: 'Dragon',
-    part: 2,
-    status: 'WATCHED',
-  },
-  {
-    id: 102,
-    name: 'Shiva',
-    part: 3,
-    status: 'WATCHING',
-  },
-  {
-    id: 103,
-    name: 'Vishnu',
-    part: 4,
-    status: 'COMING SOON',
-  },
-  {
-    id: 104,
-    name: 'Action Hero',
-    part: 5,
-    status: 'PLAN TO WATCH',
-  },
-  {
-    id: 105,
-    name: 'Super Hero',
-    part: 6,
-    status: 'COMING SOON',
-  },
-  {
-    id: 106,
-    name: 'Super Man',
-    part: 7,
-    status: 'COMING SOON',
-  },
-  {
-    id: 107,
-    name: 'Super Woman',
-    part: 8,
-    status: 'PLAN TO WATCH',
-  },
-  {
-    id: 108,
-    name: 'Super Girl',
-    part: 9,
-    status: 'COMING SOON',
-  },
-  {
-    id: 109,
-    name: 'Super Boy',
-    part: 10,
-    status: 'WATCHING',
-  },
-  {
-    id: 110,
-    name: 'Super Woman shadow',
-    part: 11,
-    status: 'WATCHED',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { movieGet, type MovieData } from '@/lib/api/movie';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // function ProductNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -140,6 +80,14 @@ export default function MovieTable() {
     setAlertDialog(true);
   };
 
+  // movie get
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ['movie'],
+    queryFn: () => movieGet(),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <>
       <div className="mx-1 md:mx-0">
@@ -155,7 +103,28 @@ export default function MovieTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {isLoading &&
+                isFetching &&
+                [...Array(10)].map((_, index) => (
+                  <TableRow key={index} className="odd:bg-muted/50">
+                    <TableCell className="h-16 text-center">
+                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
+                    </TableCell>
+                    <TableCell className="h-16 text-center">
+                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
+                    </TableCell>
+                    <TableCell className="h-16 text-center">
+                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
+                    </TableCell>
+                    <TableCell className="h-16 text-center">
+                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
+                    </TableCell>
+                    <TableCell className="h-16 text-center">
+                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {data?.map((product: MovieData & { id: number }) => (
                 <TableRow key={product.id} className="odd:bg-muted/50">
                   <TableCell className="pl-4">{product.id}</TableCell>
                   <TableCell>
