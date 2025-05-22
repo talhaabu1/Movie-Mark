@@ -30,7 +30,6 @@ import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { movieGet, type MovieData } from '@/lib/api/movie';
-import { Skeleton } from '@/components/ui/skeleton';
 
 // function ProductNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
