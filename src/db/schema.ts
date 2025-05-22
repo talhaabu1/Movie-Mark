@@ -31,7 +31,7 @@ export const movieTable = pgTable('movie', {
   status: movieStatusEnum('status').notNull(),
   userId: integer('user_id')
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
   createdAt: timestamp('create_at', { withTimezone: true }).defaultNow(),
 });
 

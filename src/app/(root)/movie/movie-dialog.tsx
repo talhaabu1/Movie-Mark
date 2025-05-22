@@ -28,7 +28,13 @@ import StatusSelect from '@/components/status-select';
 import { useEffect } from 'react';
 
 export const formSchema = z.object({
-  name: z.string().min(1, 'Movie name is required'),
+  name: z
+    .string()
+    .min(1, 'Movie name is required')
+    .regex(
+      /^[A-Za-z0-9\s]+$/,
+      'Only English letters, numbers and spaces are allowed'
+    ),
   part: z.coerce.number().min(1, 'Part must be at least 1'),
   status: z.string().min(1, 'Status is required'),
 });

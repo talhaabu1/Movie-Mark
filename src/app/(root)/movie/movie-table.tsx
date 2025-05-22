@@ -87,7 +87,7 @@ export default function MovieTable() {
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
-
+  console.log(data?.length);
   return (
     <>
       <div className="mx-1 md:mx-0">
@@ -103,27 +103,15 @@ export default function MovieTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading &&
-                isFetching &&
-                [...Array(10)].map((_, index) => (
-                  <TableRow key={index} className="odd:bg-muted/50">
-                    <TableCell className="h-16 text-center">
-                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                    </TableCell>
-                    <TableCell className="h-16 text-center">
-                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                    </TableCell>
-                    <TableCell className="h-16 text-center">
-                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                    </TableCell>
-                    <TableCell className="h-16 text-center">
-                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                    </TableCell>
-                    <TableCell className="h-16 text-center">
-                      <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                    </TableCell>
-                  </TableRow>
-                ))}
+              {isLoading && isFetching && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="h-24 text-center text-muted-foreground">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
               {data?.map((product: MovieData & { id: number }) => (
                 <TableRow key={product.id} className="odd:bg-muted/50">
                   <TableCell className="pl-4">{product.id}</TableCell>
@@ -185,6 +173,15 @@ export default function MovieTable() {
                   </TableCell>
                 </TableRow>
               ))}
+              {data?.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="h-24 text-center text-muted-foreground">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

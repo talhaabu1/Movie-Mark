@@ -12,7 +12,7 @@ import { moviePost, type MovieData } from '@/lib/api/movie';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { GeistMono } from 'geist/font/mono';
-
+import { capitalCase } from 'text-case';
 const Page = () => {
   const queryClient = useQueryClient();
 
@@ -56,7 +56,11 @@ const Page = () => {
           mode="create"
           onSubmit={(data, { reset }) => {
             movieMutation.mutate(
-              { ...data, userId: Number(session?.user?.id) },
+              {
+                ...data,
+                name: capitalCase(data.name),
+                userId: Number(session?.user?.id),
+              },
               {
                 onSuccess: () => {
                   reset();
