@@ -28,8 +28,7 @@ import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-import { useQuery } from '@tanstack/react-query';
-import { movieGet, type MovieData } from '@/lib/api/movie';
+import { type MovieDataType } from '@/lib/api/movie';
 
 // function ProductNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -56,7 +55,13 @@ interface SelectedProductType {
   status: string;
 }
 
-export default function MovieTable() {
+interface Props {
+  data: Array<MovieDataType & { id: number }>;
+  isLoading: boolean;
+  isFetching: boolean;
+}
+
+export default function MovieTable({ data, isLoading, isFetching }: Props) {
   const [movieDialog, setMovieDialog] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [alertDialogInfo, setAlertDialogInfo] = useState<{
@@ -79,14 +84,6 @@ export default function MovieTable() {
     setAlertDialog(true);
   };
 
-  // movie get
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['movie'],
-    queryFn: () => movieGet(),
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-  });
-  console.log(data?.length);
   return (
     <>
       <div className="mx-1 md:mx-0">
@@ -102,7 +99,7 @@ export default function MovieTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading && isFetching && (
+              {(isLoading || isFetching) && (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -111,67 +108,72 @@ export default function MovieTable() {
                   </TableCell>
                 </TableRow>
               )}
-              {data?.map((product: MovieData & { id: number }) => (
-                <TableRow key={product.id} className="odd:bg-muted/50">
-                  <TableCell className="pl-4">{product.id}</TableCell>
-                  <TableCell>
-                    <div className="md:hidden">
-                      {product.name.length > 10 ? (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button className="text-left">
-                              {product.name.slice(0, 10)}...
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-fit">
-                            {product.name}
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        product.name
-                      )}
-                    </div>
-                    <div className="hidden md:block">{product.name}</div>
-                  </TableCell>
-                  <TableCell>{product.part}</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={cn('rounded', getStatusColor(product.status))}
-                      variant="outline">
-                      {product.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="rounded-full shadow-none"
-                          aria-label="Open edit menu">
-                          <EllipsisIcon size={16} aria-hidden="true" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onSelect={() => handleEditClick(product)}>
-                          <Pencil size={16} /> <span>Edit</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={() =>
-                            handleDeleteClick({
-                              id: product.id,
-                              movie: product.name,
-                            })
-                          }
-                          className=" text-destructive">
-                          <Trash2 size={16} /> <span>Delete</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {isLoading ||
+                isFetching ||
+                data?.map((product) => (
+                  <TableRow key={product.id} className="odd:bg-muted/50">
+                    <TableCell className="pl-4">{product.id}</TableCell>
+                    <TableCell>
+                      <div className="md:hidden">
+                        {product.name.length > 10 ? (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button className="text-left">
+                                {product.name.slice(0, 10)}...
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-fit">
+                              {product.name}
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          product.name
+                        )}
+                      </div>
+                      <div className="hidden md:block">{product.name}</div>
+                    </TableCell>
+                    <TableCell>{product.part}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={cn(
+                          'rounded',
+                          getStatusColor(product.status)
+                        )}
+                        variant="outline">
+                        {product.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="rounded-full shadow-none"
+                            aria-label="Open edit menu">
+                            <EllipsisIcon size={16} aria-hidden="true" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onSelect={() => handleEditClick(product)}>
+                            <Pencil size={16} /> <span>Edit</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() =>
+                              handleDeleteClick({
+                                id: product.id,
+                                movie: product.name,
+                              })
+                            }
+                            className=" text-destructive">
+                            <Trash2 size={16} /> <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
               {data?.length === 0 && (
                 <TableRow>
                   <TableCell

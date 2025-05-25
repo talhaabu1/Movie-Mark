@@ -1,13 +1,21 @@
 import api from './baseUrl';
 
-export type MovieData = {
+type MovieGetType = {
+  status: string;
+  userId: number;
+  page?: number;
+  limit?: number;
+  search?: string;
+};
+
+export type MovieDataType = {
   name: string;
   part: number;
   status: string;
   userId: number;
 };
 
-export const moviePost = async (movie: MovieData) => {
+export const moviePost = async (movie: MovieDataType) => {
   try {
     const res = await api.post('/movie', movie);
     return res.data;
@@ -16,9 +24,38 @@ export const moviePost = async (movie: MovieData) => {
   }
 };
 
-export const movieGet = async () => {
+export const movieGet = async ({
+  userId,
+  status,
+  page,
+  limit,
+}: MovieGetType) => {
   try {
-    const res = await api.get('/movie');
+    const res = await api.get('/movie', {
+      params: {
+        userId,
+        status,
+        page,
+        limit,
+      },
+    });
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const movieSearch = async ({
+  search,
+  userId,
+}: Pick<MovieGetType, 'search' | 'userId'>) => {
+  try {
+    const res = await api.get('/movie/search', {
+      params: {
+        search,
+        userId,
+      },
+    });
     return res.data;
   } catch (err) {
     throw err;

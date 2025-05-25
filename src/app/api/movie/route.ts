@@ -1,23 +1,62 @@
 import { db } from '@/db';
 import { movieTable } from '@/db/schema';
-import { NextResponse } from 'next/server';
+import { isValidMovieStatus } from '@/types/enum';
+import { and, eq, count, ilike } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const movies = await db.query.movieTable.findMany({
-      orderBy: (movie, { desc }) => [desc(movie.createdAt)],
-      limit: 10,
-    });
-    return NextResponse.json(movies);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch movies!',
-        status: 'error',
+    const { searchParams } = new URL(req.url);
+
+    const statusParam = searchParams.get('status');
+    const searchParam = searchParams.get('search')?.trim();
+    const userIdParam = searchParams.get('userId');
+    const pageParam = searchParams.get('page') || '1';
+    const limitParam = searchParams.get('limit') || '10';
+
+    const page = Math.max(1, parseInt(pageParam));
+    const limit = Math.max(1, parseInt(limitParam));
+    const offset = (page - 1) * limit;
+
+    const where = [];
+
+    if (userIdParam) {
+      where.push(eq(movieTable.userId, Number(userIdParam)));
+    }
+
+    if (searchParam) {
+      where.push(ilike(movieTable.name, `%${searchParam}%`));
+    }
+
+    if (statusParam && isValidMovieStatus(statusParam)) {
+      where.push(eq(movieTable.status, statusParam));
+    }
+
+    const filter = where.length ? and(...where) : undefined;
+
+    const [movies, [{ count: totalCount }]] = await Promise.all([
+      db.query.movieTable.findMany({
+        where: filter,
+        orderBy: (movie, { desc }) => [desc(movie.createdAt)],
+        limit,
+        offset,
+      }),
+      db.select({ count: count() }).from(movieTable).where(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return Response.json({
+      data: movies,
+      meta: {
+        totalCount,
+        totalPages,
+        currentPage: page,
+        perPage: limit,
       },
-      { status: 500 }
-    );
+    });
+  } catch (err) {
+    console.error(err);
+    return Response.json({ error: 'Failed to fetch movies' }, { status: 500 });
   }
 }
 
@@ -25,13 +64,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     await db.insert(movieTable).values(body);
-    return NextResponse.json({
+    return Response.json({
       status: 'success',
       message: 'Movie added successfully!',
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return Response.json(
       {
         error: 'Failed to added movie',
         status: 'error',
