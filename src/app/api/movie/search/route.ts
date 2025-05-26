@@ -22,12 +22,12 @@ export async function GET(req: Request) {
 
     const movieName = await db.query.movieTable.findMany({
       where: filter,
-      orderBy: (movie, { desc }) => [desc(movie.createdAt)],
+      orderBy: (movie, { asc }) => [asc(movie.createdAt)],
       columns: {
         id: true,
         name: true,
       },
-      limit: 10,
+      limit: 5,
     });
 
     return Response.json(movieName);

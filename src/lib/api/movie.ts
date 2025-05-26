@@ -29,6 +29,7 @@ export const movieGet = async ({
   status,
   page,
   limit,
+  search,
 }: MovieGetType) => {
   try {
     const res = await api.get('/movie', {
@@ -37,6 +38,7 @@ export const movieGet = async ({
         status,
         page,
         limit,
+        search,
       },
     });
     return res.data;

@@ -6,7 +6,12 @@ import { useState } from 'react';
 import MovieDialog from './movie-dialog';
 import MovieTable from './movie-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { movieGet, moviePost, type MovieDataType } from '@/lib/api/movie';
+import {
+  movieGet,
+  moviePost,
+  movieSearch,
+  type MovieDataType,
+} from '@/lib/api/movie';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { GeistMono } from 'geist/font/mono';
@@ -21,7 +26,8 @@ const Page = () => {
   const [open, setOpen] = useState(false);
 
   // movie store
-  const { status, setStatus, page, setPage } = useMovieStore();
+  const { status, setStatus, page, setPage, setSearch, search } =
+    useMovieStore();
 
   // user session
   const { data: session } = useSession();
@@ -47,20 +53,22 @@ const Page = () => {
 
   // movie get
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['movie', userId, status, page],
-    queryFn: () => movieGet({ userId, status, page, limit: 10 }),
+    queryKey: ['movie', userId, status, page, search],
+    queryFn: () => movieGet({ userId, status, page, limit: 10, search }),
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
-  const handleSelect = (movieId: string) => {
-    console.log('Selected Movie ID:', movieId);
-  };
-
   return (
     <div>
       <section className=" flex items-center gap-x-2 mt-3 mx-2 md:mx-0">
-        <Search onSelect={handleSelect} />
+        <Search
+          search={search}
+          setSearch={setSearch}
+          placeholder="Movie name..."
+          queryKey="search"
+          queryFn={(search) => movieSearch({ search, userId })}
+        />
         <StatusSelect
           className="*:not-first:mt-2 flex-1 basis-0 select-none"
           value={status}

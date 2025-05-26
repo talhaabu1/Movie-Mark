@@ -19,82 +19,39 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useQuery } from '@tanstack/react-query';
+import { useDebounce } from '@uidotdev/usehooks';
 
-const frameworks = [
-  {
-    value: 'next.jsrrrrrrrr',
-    label: 'Next.jsrrrrrrrr',
-  },
-  {
-    value: 'sveltekit',
-    label: 'SvelteKit',
-  },
-  {
-    value: 'nuxt.js',
-    label: 'Nuxt.js',
-  },
-  {
-    value: 'remix',
-    label: 'Remix',
-  },
-  {
-    value: 'astro',
-    label: 'Astro',
-  },
-  {
-    value: 'angular',
-    label: 'Angular',
-  },
-  {
-    value: 'vue',
-    label: 'Vue.js',
-  },
-  {
-    value: 'react',
-    label: 'React',
-  },
-  {
-    value: 'ember',
-    label: 'Ember.js',
-  },
-  {
-    value: 'gatsby',
-    label: 'Gatsby',
-  },
-  {
-    value: 'eleventy',
-    label: 'Eleventy',
-  },
-  {
-    value: 'solid',
-    label: 'SolidJS',
-  },
-  {
-    value: 'preact',
-    label: 'Preact',
-  },
-  {
-    value: 'qwik',
-    label: 'Qwik',
-  },
-  {
-    value: 'alpine',
-    label: 'Alpine.js',
-  },
-  {
-    value: 'lit',
-    label: 'Lit',
-  },
-];
-
-interface Props {
-  onSelect: (value: string) => void;
+interface SearchItem {
+  id: number;
+  name: string;
 }
 
-const Search = ({ onSelect }: Props) => {
+interface Props {
+  placeholder: string;
+  search: string;
+  setSearch: (value: string) => void;
+  queryKey: string;
+  queryFn: (search: string) => Promise<SearchItem[]>;
+}
+
+const Search = ({
+  search,
+  setSearch,
+  queryKey,
+  queryFn,
+  placeholder,
+}: Props) => {
   const id = useId();
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
+  const debounced = useDebounce(value, 300);
+
+  const { data, isLoading } = useQuery({
+    queryKey: [queryKey, debounced],
+    queryFn: () => queryFn(debounced),
+    enabled: open,
+  });
 
   return (
     <div className="*:not-first:mt-2 flex-1 basis-0 truncate">
@@ -109,17 +66,18 @@ const Search = ({ onSelect }: Props) => {
               className="bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]">
               <div className="flex items-center justify-between w-full">
                 <span
-                  className={cn('truncate', !value && 'text-muted-foreground')}>
-                  {value
-                    ? frameworks.find((framework) => framework.value === value)
-                        ?.label
-                    : 'Search...'}
+                  className={cn(
+                    'truncate',
+                    !search && 'text-muted-foreground'
+                  )}>
+                  {search || 'Search...'}
                 </span>
                 <div className="flex items-center justify-end gap-1 ml-3">
-                  {value && (
+                  {search && (
                     <span
                       onClick={(e) => {
                         e.stopPropagation();
+                        setSearch('');
                         setValue('');
                       }}
                       aria-label="Clear selection"
@@ -142,23 +100,31 @@ const Search = ({ onSelect }: Props) => {
           className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0"
           align="start">
           <Command>
-            <CommandInput placeholder="Movie Name..." />
+            <CommandInput
+              placeholder={placeholder}
+              value={value}
+              onValueChange={setValue}
+            />
             <CommandList>
-              <CommandEmpty>No Movie found.</CommandEmpty>
+              {isLoading ? (
+                <p className="py-6 text-center text-sm">Loading...</p>
+              ) : (
+                <CommandEmpty>No results found.</CommandEmpty>
+              )}
+
               <CommandGroup>
-                {frameworks.map((framework) => (
+                {data?.map((item) => (
                   <CommandItem
-                    key={framework.value}
-                    value={framework.value}
+                    key={item.id}
+                    value={item.name}
                     onSelect={(currentValue) => {
                       const newValue =
-                        currentValue === value ? '' : currentValue;
-                      onSelect(newValue);
-                      setValue(newValue);
+                        currentValue === search ? '' : currentValue;
+                      setSearch(newValue);
                       setOpen(false);
                     }}>
-                    {framework.label}
-                    {value === framework.value && (
+                    {item.name}
+                    {search === item.name && (
                       <CheckIcon size={16} className="ml-auto" />
                     )}
                   </CommandItem>
