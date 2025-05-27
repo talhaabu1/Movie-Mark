@@ -34,10 +34,11 @@ const Page = () => {
   const userId = Number(session?.user?.id);
 
   // movie mutation
-  const movieMutation = useMutation({
+  const moviePostMutation = useMutation({
     mutationFn: async (data: MovieDataType) => moviePost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movie'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
       toast.success('Movie added successfully!', {
         className: `${GeistMono.className}`,
       });
@@ -65,14 +66,16 @@ const Page = () => {
         <Search
           search={search}
           setSearch={setSearch}
-          placeholder="Movie name..."
+          placeholder="Movie Name..."
           queryKey="search"
           queryFn={(search) => movieSearch({ search, userId })}
+          setPage={setPage}
         />
         <StatusSelect
           className="*:not-first:mt-2 flex-1 basis-0 select-none"
           value={status}
           onChange={setStatus}
+          setPage={setPage}
           allOptions
         />
         <MovieDialog
@@ -80,7 +83,7 @@ const Page = () => {
           setOpen={setOpen}
           mode="create"
           onSubmit={(data, { reset }) => {
-            movieMutation.mutate(
+            moviePostMutation.mutate(
               {
                 ...data,
                 name: capitalCase(data.name),
@@ -94,7 +97,7 @@ const Page = () => {
               }
             );
           }}
-          isLoading={movieMutation.isPending}
+          isLoading={moviePostMutation.isPending}
         />
       </section>
       <Separator gradient className="my-3" />

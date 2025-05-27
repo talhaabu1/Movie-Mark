@@ -9,7 +9,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { EllipsisIcon, Pencil, Trash2 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -28,7 +27,9 @@ import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-import { type MovieDataType } from '@/lib/api/movie';
+import { movieDelete, type MovieDataType } from '@/lib/api/movie';
+import { GeistMono } from 'geist/font/mono';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // function ProductNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -62,12 +63,15 @@ interface Props {
 }
 
 export default function MovieTable({ data, isLoading, isFetching }: Props) {
+  const queryClient = useQueryClient();
+
   const [movieDialog, setMovieDialog] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [alertDialogInfo, setAlertDialogInfo] = useState<{
     id: number;
     movie: string;
   }>({ id: 0, movie: '' });
+
   const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>({
     name: '',
     part: 0,
@@ -83,6 +87,25 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
     setAlertDialogInfo({ id, movie });
     setAlertDialog(true);
   };
+
+  // movie delete mutation
+  const movieDeleteMutation = useMutation({
+    mutationFn: async (id: number) => movieDelete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['movie'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
+
+      toast.success('Movie deleted successfully!', {
+        className: `${GeistMono.className}`,
+      });
+    },
+    onError: (err) => {
+      toast.error('Failed to delete movie!', {
+        className: `${GeistMono.className}`,
+      });
+      console.error(err);
+    },
+  });
 
   return (
     <>
@@ -218,9 +241,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
         open={alertDialog}
         setOpen={setAlertDialog}
         onConfirm={() => {
-          toast.error('Movie deleted successfully', {
-            className: 'font-mono',
-          });
+          movieDeleteMutation.mutate(alertDialogInfo.id);
         }}
       />
     </>

@@ -79,3 +79,23 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+    await db.delete(movieTable).where(eq(movieTable.id, id));
+    return Response.json({
+      status: 'success',
+      message: 'Movie deleted successfully!',
+    });
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      {
+        error: 'Failed to delete movie',
+        status: 'error',
+      },
+      { status: 500 }
+    );
+  }
+}

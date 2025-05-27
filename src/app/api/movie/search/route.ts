@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { movieTable } from '@/db/schema';
 import { and, eq, ilike } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
@@ -30,10 +31,10 @@ export async function GET(req: Request) {
       limit: 5,
     });
 
-    return Response.json(movieName);
+    return NextResponse.json(movieName);
   } catch (error) {
     console.error(error);
-    return Response.json(
+    return NextResponse.json(
       {
         error: 'Failed to get movie name',
         status: 'error',

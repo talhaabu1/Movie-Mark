@@ -33,16 +33,18 @@ export const STATUS_OPTIONS = [
 ];
 
 type StatusSelectProps = {
-  value?: string;
-  onChange?: (value: string) => void;
+  value: string;
+  onChange: (value: string) => void;
   className?: string;
   allOptions?: boolean;
+  setPage?: (value: number) => void;
 };
 
 export default function StatusSelect({
   value,
   onChange,
   className,
+  setPage,
   allOptions = false,
 }: StatusSelectProps) {
   const id = useId();
@@ -53,7 +55,12 @@ export default function StatusSelect({
 
   return (
     <div className={className}>
-      <Select value={value} onValueChange={onChange}>
+      <Select
+        value={value}
+        onValueChange={(value) => {
+          setPage?.(1);
+          onChange(value);
+        }}>
         <SelectTrigger
           id={id}
           className="[&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span]:w-full [&>span]:truncate">

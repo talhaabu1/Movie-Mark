@@ -63,3 +63,12 @@ export const movieSearch = async ({
     throw err;
   }
 };
+
+export const movieDelete = async (id: number) => {
+  try {
+    const res = await api.delete(`/movie/${id}`);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

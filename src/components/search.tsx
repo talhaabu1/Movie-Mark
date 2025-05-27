@@ -33,6 +33,7 @@ interface Props {
   setSearch: (value: string) => void;
   queryKey: string;
   queryFn: (search: string) => Promise<SearchItem[]>;
+  setPage?: (value: number) => void;
 }
 
 const Search = ({
@@ -40,16 +41,18 @@ const Search = ({
   setSearch,
   queryKey,
   queryFn,
+  setPage,
   placeholder,
 }: Props) => {
   const id = useId();
   const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useState<string>('');
-  const debounced = useDebounce(value, 300);
+  const [query, setQuery] = useState<string>('');
+  const debounced = useDebounce(query, 300);
 
   const { data, isLoading } = useQuery({
     queryKey: [queryKey, debounced],
     queryFn: () => queryFn(debounced),
+    staleTime: 1000 * 60 * 1,
     enabled: open,
   });
 
@@ -78,7 +81,7 @@ const Search = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         setSearch('');
-                        setValue('');
+                        setQuery('');
                       }}
                       aria-label="Clear selection"
                       className="p-0 hover:bg-transparent flex items-center justify-center cursor-pointer">
@@ -102,8 +105,8 @@ const Search = ({
           <Command>
             <CommandInput
               placeholder={placeholder}
-              value={value}
-              onValueChange={setValue}
+              value={query}
+              onValueChange={setQuery}
             />
             <CommandList>
               {isLoading ? (
@@ -122,6 +125,7 @@ const Search = ({
                         currentValue === search ? '' : currentValue;
                       setSearch(newValue);
                       setOpen(false);
+                      setPage?.(1);
                     }}>
                     {item.name}
                     {search === item.name && (
