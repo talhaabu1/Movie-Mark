@@ -27,9 +27,10 @@ import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-import { movieDelete, type MovieDataType } from '@/lib/api/movie';
+import { movieDelete, movieUpdate, type MovieDataType } from '@/lib/api/movie';
 import { GeistMono } from 'geist/font/mono';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { capitalCase } from 'text-case';
 
 // function ProductNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -51,6 +52,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 // }
 
 interface SelectedProductType {
+  id: number;
   name: string;
   part: number;
   status: string;
@@ -73,6 +75,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
   }>({ id: 0, movie: '' });
 
   const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>({
+    id: 0,
     name: '',
     part: 0,
     status: '',
@@ -101,6 +104,32 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
     },
     onError: (err) => {
       toast.error('Failed to delete movie!', {
+        className: `${GeistMono.className}`,
+      });
+      console.error(err);
+    },
+  });
+
+  // movie update mutation
+  const movieUpdateMutation = useMutation({
+    mutationFn: ({
+      name,
+      part,
+      status,
+      id,
+    }: Pick<
+      MovieDataType & { id: number },
+      'name' | 'part' | 'status' | 'id'
+    >) => movieUpdate(id, { name, part, status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['movie'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
+      toast.success('Movie updated successfully!', {
+        className: `${GeistMono.className}`,
+      });
+    },
+    onError: (err) => {
+      toast.error('Failed to update movie!', {
         className: `${GeistMono.className}`,
       });
       console.error(err);
@@ -197,7 +226,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
                     </TableCell>
                   </TableRow>
                 ))}
-              {data?.length === 0 && (
+              {data?.length === 0 && !isLoading && (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -214,6 +243,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
       <MovieDialog
         mode="edit"
         trigger={<p className="hidden">hidden</p>}
+        isLoading={movieUpdateMutation.isPending}
         open={movieDialog}
         setOpen={setMovieDialog}
         defaultValues={{
@@ -222,8 +252,18 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
           status: selectedProduct.status,
         }}
         onSubmit={(data, { reset }) => {
-          console.log(data);
-          reset();
+          movieUpdateMutation.mutate(
+            {
+              ...data,
+              id: selectedProduct.id,
+              name: capitalCase(data.name),
+            },
+            {
+              onSuccess: () => {
+                reset();
+              },
+            }
+          );
         }}
       />
       {/* Dialog is rendered outside dropdown menu */}

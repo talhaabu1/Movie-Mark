@@ -37,6 +37,12 @@ export async function GET(req: Request) {
       db.query.movieTable.findMany({
         where: filter,
         orderBy: (movie, { desc }) => [desc(movie.createdAt)],
+        columns: {
+          id: true,
+          name: true,
+          part: true,
+          status: true,
+        },
         limit,
         offset,
       }),
@@ -73,26 +79,6 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error: 'Failed to added movie',
-        status: 'error',
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    const { id } = await req.json();
-    await db.delete(movieTable).where(eq(movieTable.id, id));
-    return Response.json({
-      status: 'success',
-      message: 'Movie deleted successfully!',
-    });
-  } catch (error) {
-    console.error(error);
-    return Response.json(
-      {
-        error: 'Failed to delete movie',
         status: 'error',
       },
       { status: 500 }

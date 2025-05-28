@@ -125,7 +125,7 @@ export default function MovieDialog({
                 <FormItem>
                   <FormLabel>Movie</FormLabel>
                   <FormControl>
-                    <Input placeholder="Movie name..." {...field} />
+                    <Input placeholder="Movie Name..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

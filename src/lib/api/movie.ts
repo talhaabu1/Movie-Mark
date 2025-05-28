@@ -72,3 +72,15 @@ export const movieDelete = async (id: number) => {
     throw err;
   }
 };
+
+export const movieUpdate = async (
+  id: number,
+  movie: Partial<MovieDataType>
+) => {
+  try {
+    const res = await api.patch(`/movie/${id}`, movie);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

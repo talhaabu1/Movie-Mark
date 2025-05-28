@@ -42,7 +42,6 @@ const Page = () => {
       toast.success('Movie added successfully!', {
         className: `${GeistMono.className}`,
       });
-      setOpen(false);
     },
     onError: (err) => {
       toast.error('Failed to add movie!', {
@@ -92,7 +91,6 @@ const Page = () => {
               {
                 onSuccess: () => {
                   reset();
-                  setOpen(false);
                 },
               }
             );
