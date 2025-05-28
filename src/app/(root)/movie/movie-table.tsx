@@ -160,8 +160,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
                   </TableCell>
                 </TableRow>
               )}
-              {isLoading ||
-                isFetching ||
+              {!(isLoading || isFetching) &&
                 data?.map((product) => (
                   <TableRow key={product.id} className="odd:bg-muted/50">
                     <TableCell className="pl-4">{product.id}</TableCell>
@@ -226,7 +225,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
                     </TableCell>
                   </TableRow>
                 ))}
-              {data?.length === 0 && !isLoading && (
+              {data?.length === 0 && !isLoading && !isFetching && (
                 <TableRow>
                   <TableCell
                     colSpan={5}
