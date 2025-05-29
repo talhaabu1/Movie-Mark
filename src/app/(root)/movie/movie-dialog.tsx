@@ -25,7 +25,7 @@ import {
 import { PlusIcon } from 'lucide-react';
 import { Separator } from '@/components/indie/separator';
 import StatusSelect from '@/components/status-select';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const formSchema = z.object({
   name: z
@@ -66,24 +66,23 @@ export default function MovieDialog({
       name: '',
       part: 1,
       status: '',
-      ...defaultValues,
     },
   });
 
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
       form.reset({
-        name: defaultValues.name ?? '',
-        part: defaultValues.part ?? 1,
-        status: defaultValues.status ?? '',
+        name: defaultValues.name,
+        part: defaultValues.part,
+        status: defaultValues.status,
       });
     }
-  }, [open, defaultValues, form, mode]);
+  }, [open, mode]);
 
   const handleSubmit = (values: FormData) => {
     onSubmit(values, {
       reset: () => {
-        form.reset();
+        if (mode === 'create') form.reset();
         setOpen(false);
       },
     });
