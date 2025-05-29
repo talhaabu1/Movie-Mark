@@ -6,19 +6,14 @@ import { useState } from 'react';
 import MovieDialog from './movie-dialog';
 import MovieTable from './movie-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  movieGet,
-  moviePost,
-  movieSearch,
-  type MovieDataType,
-} from '@/lib/api/movie';
+import { movieGet, moviePost, movieSearch } from '@/lib/api/movie';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { GeistMono } from 'geist/font/mono';
-import { capitalCase } from 'text-case';
 import { useMovieStore } from '@/store/movieStore';
 import CustomPagination from '@/components/custom-pagination';
 import Search from '@/components/search';
+import type { MovieCreateInput } from '@/types/movie';
 
 const Page = () => {
   const queryClient = useQueryClient();
@@ -35,7 +30,7 @@ const Page = () => {
 
   // movie mutation
   const moviePostMutation = useMutation({
-    mutationFn: async (data: MovieDataType) => moviePost(data),
+    mutationFn: async (data: MovieCreateInput) => moviePost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movie'] });
       queryClient.invalidateQueries({ queryKey: ['search'] });
@@ -85,7 +80,6 @@ const Page = () => {
             moviePostMutation.mutate(
               {
                 ...data,
-                name: capitalCase(data.name),
                 userId,
               },
               {

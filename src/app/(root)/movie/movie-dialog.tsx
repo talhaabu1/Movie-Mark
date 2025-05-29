@@ -25,7 +25,8 @@ import {
 import { PlusIcon } from 'lucide-react';
 import { Separator } from '@/components/indie/separator';
 import StatusSelect from '@/components/status-select';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { capitalCase } from 'text-case';
 
 export const formSchema = z.object({
   name: z
@@ -34,19 +35,20 @@ export const formSchema = z.object({
     .regex(
       /^[A-Za-z0-9\s]+$/,
       'Only English letters, numbers and spaces are allowed'
-    ),
+    )
+    .transform((name) => capitalCase(name)),
   part: z.coerce.number().min(1, 'Part must be at least 1'),
   status: z.string().min(1, 'Status is required'),
 });
 
-export type FormData = z.infer<typeof formSchema>;
+export type FormDataType = z.infer<typeof formSchema>;
 
 type MovieDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onSubmit: (data: FormData, helpers: { reset: () => void }) => void;
+  onSubmit: (data: FormDataType, helpers: { reset: () => void }) => void;
   mode?: 'create' | 'edit';
-  defaultValues?: Partial<FormData>;
+  defaultValues?: Partial<FormDataType>;
   trigger?: React.ReactNode;
   isLoading?: boolean;
 };
@@ -60,7 +62,7 @@ export default function MovieDialog({
   trigger,
   isLoading = false,
 }: MovieDialogProps) {
-  const form = useForm<FormData>({
+  const form = useForm<FormDataType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
@@ -79,7 +81,7 @@ export default function MovieDialog({
     }
   }, [open, mode]);
 
-  const handleSubmit = (values: FormData) => {
+  const handleSubmit = (values: FormDataType) => {
     onSubmit(values, {
       reset: () => {
         if (mode === 'create') form.reset();

@@ -88,11 +88,13 @@ const Search = ({
                       <X size={16} className="shrink-0" />
                     </span>
                   )}
-                  <ChevronDownIcon
-                    size={16}
-                    className="text-muted-foreground/80 shrink-0"
-                    aria-hidden="true"
-                  />
+                  {!search && (
+                    <ChevronDownIcon
+                      size={16}
+                      className="text-muted-foreground/80 shrink-0"
+                      aria-hidden="true"
+                    />
+                  )}
                 </div>
               </div>
             </Button>

@@ -1,6 +1,7 @@
+import type { MovieCreateInput, MovieUpdateInput } from '@/types/movie';
 import api from './baseUrl';
 
-type MovieGetType = {
+type MovieGetParams = {
   status: string;
   userId: number;
   page?: number;
@@ -8,14 +9,7 @@ type MovieGetType = {
   search?: string;
 };
 
-export type MovieDataType = {
-  name: string;
-  part: number;
-  status: string;
-  userId: number;
-};
-
-export const moviePost = async (movie: MovieDataType) => {
+export const moviePost = async (movie: MovieCreateInput) => {
   try {
     const res = await api.post('/movie', movie);
     return res.data;
@@ -24,22 +18,10 @@ export const moviePost = async (movie: MovieDataType) => {
   }
 };
 
-export const movieGet = async ({
-  userId,
-  status,
-  page,
-  limit,
-  search,
-}: MovieGetType) => {
+export const movieGet = async (params: MovieGetParams) => {
   try {
     const res = await api.get('/movie', {
-      params: {
-        userId,
-        status,
-        page,
-        limit,
-        search,
-      },
+      params,
     });
     return res.data;
   } catch (err) {
@@ -50,7 +32,7 @@ export const movieGet = async ({
 export const movieSearch = async ({
   search,
   userId,
-}: Pick<MovieGetType, 'search' | 'userId'>) => {
+}: Pick<MovieGetParams, 'search' | 'userId'>) => {
   try {
     const res = await api.get('/movie/search', {
       params: {
@@ -73,10 +55,7 @@ export const movieDelete = async (id: number) => {
   }
 };
 
-export const movieUpdate = async (
-  id: number,
-  movie: Partial<MovieDataType>
-) => {
+export const movieUpdate = async (id: number, movie: MovieUpdateInput) => {
   try {
     const res = await api.patch(`/movie/${id}`, movie);
     return res.data;

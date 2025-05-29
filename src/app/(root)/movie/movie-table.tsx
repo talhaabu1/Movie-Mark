@@ -27,12 +27,12 @@ import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-import { movieDelete, movieUpdate, type MovieDataType } from '@/lib/api/movie';
+import { movieDelete, movieUpdate } from '@/lib/api/movie';
 import { GeistMono } from 'geist/font/mono';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { capitalCase } from 'text-case';
+import type { Movie, MovieUpdateInput } from '@/types/movie';
 
-// function ProductNameCell({ name }: { name: string }) {
+// function itemNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
 
 //   if (name.length <= 10) return <span>{name}</span>;
@@ -51,15 +51,10 @@ import { capitalCase } from 'text-case';
 //   return <span>{name}</span>; // Desktop full show
 // }
 
-interface SelectedProductType {
-  id: number;
-  name: string;
-  part: number;
-  status: string;
-}
+type SelectedMovieType = Pick<Movie, 'id' | 'name' | 'part' | 'status'>;
 
 interface Props {
-  data: Array<MovieDataType & { id: number }>;
+  data: Array<Movie>;
   isLoading: boolean;
   isFetching: boolean;
 }
@@ -69,25 +64,24 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
 
   const [movieDialog, setMovieDialog] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
-  const [alertDialogInfo, setAlertDialogInfo] = useState<{
-    id: number;
-    movie: string;
-  }>({ id: 0, movie: '' });
+  const [alertDialogInfo, setAlertDialogInfo] = useState<
+    Pick<Movie, 'id' | 'name'>
+  >({ id: 0, name: '' });
 
-  const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>({
+  const [selectedMovie, setSelectedMovie] = useState<SelectedMovieType>({
     id: 0,
     name: '',
     part: 0,
     status: '',
   });
 
-  const handleEditClick = (product: SelectedProductType) => {
-    setSelectedProduct(product);
+  const handleEditClick = (item: SelectedMovieType) => {
+    setSelectedMovie(item);
     setMovieDialog(true);
   };
 
-  const handleDeleteClick = ({ id, movie }: { id: number; movie: string }) => {
-    setAlertDialogInfo({ id, movie });
+  const handleDeleteClick = ({ id, name }: Pick<Movie, 'id' | 'name'>) => {
+    setAlertDialogInfo({ id, name });
     setAlertDialog(true);
   };
 
@@ -112,15 +106,8 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
 
   // movie update mutation
   const movieUpdateMutation = useMutation({
-    mutationFn: ({
-      name,
-      part,
-      status,
-      id,
-    }: Pick<
-      MovieDataType & { id: number },
-      'name' | 'part' | 'status' | 'id'
-    >) => movieUpdate(id, { name, part, status }),
+    mutationFn: ({ name, part, status }: MovieUpdateInput) =>
+      movieUpdate(selectedMovie.id, { name, part, status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movie'] });
       queryClient.invalidateQueries({ queryKey: ['search'] });
@@ -161,37 +148,34 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
                 </TableRow>
               )}
               {!(isLoading || isFetching) &&
-                data?.map((product) => (
-                  <TableRow key={product.id} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">{product.id}</TableCell>
+                data?.map((item) => (
+                  <TableRow key={item.id} className="odd:bg-muted/50">
+                    <TableCell className="pl-4">{item.id}</TableCell>
                     <TableCell>
                       <div className="md:hidden">
-                        {product.name.length > 10 ? (
+                        {item.name.length > 10 ? (
                           <Popover>
                             <PopoverTrigger asChild>
                               <button className="text-left">
-                                {product.name.slice(0, 10)}...
+                                {item.name.slice(0, 10)}...
                               </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-fit">
-                              {product.name}
+                              {item.name}
                             </PopoverContent>
                           </Popover>
                         ) : (
-                          product.name
+                          item.name
                         )}
                       </div>
-                      <div className="hidden md:block">{product.name}</div>
+                      <div className="hidden md:block">{item.name}</div>
                     </TableCell>
-                    <TableCell>{product.part}</TableCell>
+                    <TableCell>{item.part}</TableCell>
                     <TableCell>
                       <Badge
-                        className={cn(
-                          'rounded',
-                          getStatusColor(product.status)
-                        )}
+                        className={cn('rounded', getStatusColor(item.status))}
                         variant="outline">
-                        {product.status}
+                        {item.status}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -207,14 +191,14 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           <DropdownMenuItem
-                            onSelect={() => handleEditClick(product)}>
+                            onSelect={() => handleEditClick(item)}>
                             <Pencil size={16} /> <span>Edit</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onSelect={() =>
                               handleDeleteClick({
-                                id: product.id,
-                                movie: product.name,
+                                id: item.id,
+                                name: item.name,
                               })
                             }
                             className=" text-destructive">
@@ -246,23 +230,16 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
         open={movieDialog}
         setOpen={setMovieDialog}
         defaultValues={{
-          name: selectedProduct.name,
-          part: selectedProduct.part,
-          status: selectedProduct.status,
+          name: selectedMovie.name,
+          part: selectedMovie.part,
+          status: selectedMovie.status,
         }}
         onSubmit={(data, { reset }) => {
-          movieUpdateMutation.mutate(
-            {
-              ...data,
-              id: selectedProduct.id,
-              name: capitalCase(data.name),
+          movieUpdateMutation.mutate(data, {
+            onSuccess: () => {
+              reset();
             },
-            {
-              onSuccess: () => {
-                reset();
-              },
-            }
-          );
+          });
         }}
       />
       {/* Dialog is rendered outside dropdown menu */}
@@ -272,7 +249,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
           <p className=" text-pretty">
             Are you sure you want to delete the movie{' '}
             <span className="text-destructive">
-              &quot;{alertDialogInfo.movie}&quot;
+              &quot;{alertDialogInfo.name}&quot;
             </span>
             ?
           </p>
