@@ -1,9 +1,9 @@
-import { movieStatusEnum } from '@/db/schema';
+import { statusEnum } from '@/db/schema';
 
-export const movieStatusList = movieStatusEnum.enumValues;
+export const statusList = statusEnum.enumValues;
 
-export type MovieStatus = (typeof movieStatusList)[number];
+export type MovieStatus = (typeof statusList)[number];
 
-export function isValidMovieStatus(status: string): status is MovieStatus {
-  return movieStatusList.includes(status as MovieStatus);
+export function isValidStatus(status: string): status is MovieStatus {
+  return statusList.includes(status as MovieStatus);
 }

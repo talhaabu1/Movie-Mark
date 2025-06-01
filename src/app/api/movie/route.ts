@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { movieTable } from '@/db/schema';
-import { isValidMovieStatus } from '@/types/enum';
+import { isValidStatus } from '@/types/enum';
 import { and, eq, count, ilike } from 'drizzle-orm';
 
 export async function GET(req: Request) {
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
       where.push(ilike(movieTable.name, `%${searchParam}%`));
     }
 
-    if (statusParam && isValidMovieStatus(statusParam)) {
+    if (statusParam && isValidStatus(statusParam)) {
       where.push(eq(movieTable.status, statusParam));
     }
 
