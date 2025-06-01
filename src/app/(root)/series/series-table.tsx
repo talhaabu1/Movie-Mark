@@ -26,12 +26,11 @@ import { cn, getStatusColor } from '@/lib/utils';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-import { movieUpdate } from '@/lib/api/movie';
 import { GeistMono } from 'geist/font/mono';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import SeriesDialog from './series-dialog';
 import type { Series, SeriesUpdateInput } from '@/types/series';
-import { seriesDelete } from '@/lib/api/series';
+import { seriesDelete, seriesUpdate } from '@/lib/api/series';
 
 // function itemNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -112,7 +111,7 @@ export default function SeriesTable({ data, isLoading, isFetching }: Props) {
   // series update mutation
   const seriesUpdateMutation = useMutation({
     mutationFn: (data: SeriesUpdateInput) =>
-      movieUpdate(selectedSeries.id, data),
+      seriesUpdate(selectedSeries.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['series'] });
       queryClient.invalidateQueries({ queryKey: ['seriesSearch'] });
