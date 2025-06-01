@@ -23,14 +23,15 @@ import {
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { cn, getStatusColor } from '@/lib/utils';
-import MovieDialog from '@/app/(root)/movie/movie-dialog';
 import { useState } from 'react';
 import AlertDeleteDialog from '@/components/alert-dialog';
 import { toast } from 'sonner';
-import { movieDelete, movieUpdate } from '@/lib/api/movie';
+import { movieUpdate } from '@/lib/api/movie';
 import { GeistMono } from 'geist/font/mono';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Movie, MovieUpdateInput } from '@/types/movie';
+import SeriesDialog from './series-dialog';
+import type { Series, SeriesUpdateInput } from '@/types/series';
+import { seriesDelete } from '@/lib/api/series';
 
 // function itemNameCell({ name }: { name: string }) {
 //   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -51,71 +52,76 @@ import type { Movie, MovieUpdateInput } from '@/types/movie';
 //   return <span>{name}</span>; // Desktop full show
 // }
 
-type SelectedMovieType = Pick<Movie, 'id' | 'name' | 'part' | 'status'>;
+type SelectedSeriesType = Pick<
+  Series,
+  'id' | 'name' | 'season' | 'episode' | 'status'
+>;
 
 interface Props {
-  data: Array<Movie>;
+  data: Array<Series>;
   isLoading: boolean;
   isFetching: boolean;
 }
 
-export default function MovieTable({ data, isLoading, isFetching }: Props) {
+export default function SeriesTable({ data, isLoading, isFetching }: Props) {
   const queryClient = useQueryClient();
 
-  const [movieDialog, setMovieDialog] = useState(false);
+  const [seriesDialog, setSeriesDialog] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [alertDialogInfo, setAlertDialogInfo] = useState<
-    Pick<Movie, 'id' | 'name'>
+    Pick<Series, 'id' | 'name'>
   >({ id: 0, name: '' });
 
-  const [selectedMovie, setSelectedMovie] = useState<SelectedMovieType>({
+  const [selectedSeries, setSelectedSeries] = useState<SelectedSeriesType>({
     id: 0,
     name: '',
-    part: 0,
+    season: 0,
+    episode: 0,
     status: '',
   });
 
-  const handleEditClick = (item: SelectedMovieType) => {
-    setSelectedMovie(item);
-    setMovieDialog(true);
+  const handleEditClick = (item: SelectedSeriesType) => {
+    setSelectedSeries(item);
+    setSeriesDialog(true);
   };
 
-  const handleDeleteClick = ({ id, name }: Pick<Movie, 'id' | 'name'>) => {
+  const handleDeleteClick = ({ id, name }: Pick<Series, 'id' | 'name'>) => {
     setAlertDialogInfo({ id, name });
     setAlertDialog(true);
   };
 
   // movie delete mutation
-  const movieDeleteMutation = useMutation({
-    mutationFn: async (id: number) => movieDelete(id),
+  const seriesDeleteMutation = useMutation({
+    mutationFn: async (id: number) => seriesDelete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['movie'] });
-      queryClient.invalidateQueries({ queryKey: ['search'] });
+      queryClient.invalidateQueries({ queryKey: ['series'] });
+      queryClient.invalidateQueries({ queryKey: ['seriesSearch'] });
 
-      toast.success('Movie deleted successfully!', {
+      toast.success('Series deleted successfully!', {
         className: `${GeistMono.className}`,
       });
     },
     onError: (err) => {
-      toast.error('Failed to delete movie!', {
+      toast.error('Failed to delete series!', {
         className: `${GeistMono.className}`,
       });
       console.error(err);
     },
   });
 
-  // movie update mutation
-  const movieUpdateMutation = useMutation({
-    mutationFn: (data: MovieUpdateInput) => movieUpdate(selectedMovie.id, data),
+  // series update mutation
+  const seriesUpdateMutation = useMutation({
+    mutationFn: (data: SeriesUpdateInput) =>
+      movieUpdate(selectedSeries.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['movie'] });
-      queryClient.invalidateQueries({ queryKey: ['search'] });
-      toast.success('Movie updated successfully!', {
+      queryClient.invalidateQueries({ queryKey: ['series'] });
+      queryClient.invalidateQueries({ queryKey: ['seriesSearch'] });
+      toast.success('Series updated successfully!', {
         className: `${GeistMono.className}`,
       });
     },
     onError: (err) => {
-      toast.error('Failed to update movie!', {
+      toast.error('Failed to update series!', {
         className: `${GeistMono.className}`,
       });
       console.error(err);
@@ -130,8 +136,9 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
             <TableHeader>
               <TableRow>
                 <TableHead className="pl-4">ID</TableHead>
-                <TableHead>Movie</TableHead>
-                <TableHead>Part</TableHead>
+                <TableHead>Series</TableHead>
+                <TableHead>Season</TableHead>
+                <TableHead>Episode</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead></TableHead>
               </TableRow>
@@ -169,7 +176,8 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
                       </div>
                       <div className="hidden md:block">{item.name}</div>
                     </TableCell>
-                    <TableCell>{item.part}</TableCell>
+                    <TableCell>{item.season}</TableCell>
+                    <TableCell>{item.episode}</TableCell>
                     <TableCell>
                       <Badge
                         className={cn('rounded', getStatusColor(item.status))}
@@ -222,19 +230,20 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
         </div>
       </div>
       {/* Dialog is rendered outside dropdown menu */}
-      <MovieDialog
+      <SeriesDialog
         mode="edit"
         trigger={<p className="hidden">hidden</p>}
-        isLoading={movieUpdateMutation.isPending}
-        open={movieDialog}
-        setOpen={setMovieDialog}
+        isLoading={seriesUpdateMutation.isPending}
+        open={seriesDialog}
+        setOpen={setSeriesDialog}
         defaultValues={{
-          name: selectedMovie.name,
-          part: selectedMovie.part,
-          status: selectedMovie.status,
+          name: selectedSeries.name,
+          season: selectedSeries.season,
+          episode: selectedSeries.episode,
+          status: selectedSeries.status,
         }}
         onSubmit={(data, { reset }) => {
-          movieUpdateMutation.mutate(data, {
+          seriesUpdateMutation.mutate(data, {
             onSuccess: () => {
               reset();
             },
@@ -246,7 +255,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
         title="Are you sure?"
         description={
           <p className=" text-pretty">
-            Are you sure you want to delete the movie{' '}
+            Are you sure you want to delete the series{' '}
             <span className="text-destructive">
               &quot;{alertDialogInfo.name}&quot;
             </span>
@@ -256,7 +265,7 @@ export default function MovieTable({ data, isLoading, isFetching }: Props) {
         open={alertDialog}
         setOpen={setAlertDialog}
         onConfirm={() => {
-          movieDeleteMutation.mutate(alertDialogInfo.id);
+          seriesDeleteMutation.mutate(alertDialogInfo.id);
         }}
       />
     </>

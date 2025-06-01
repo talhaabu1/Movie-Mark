@@ -31,13 +31,14 @@ import { capitalCase } from 'text-case';
 export const formSchema = z.object({
   name: z
     .string()
-    .min(1, 'Movie name is required')
+    .min(1, 'Series name is required')
     .regex(
       /^[A-Za-z0-9\s]+$/,
       'Only English letters, numbers and spaces are allowed'
     )
     .transform((name) => capitalCase(name)),
-  part: z.coerce.number().min(1, 'Part must be at least 1'),
+  season: z.coerce.number().min(1, 'Part must be at least 1'),
+  episode: z.coerce.number().min(1, 'Part must be at least 1'),
   status: z.string().min(1, 'Status is required'),
 });
 
@@ -53,7 +54,7 @@ type MovieDialogProps = {
   isLoading?: boolean;
 };
 
-export default function MovieDialog({
+export default function SeriesDialog({
   open,
   setOpen,
   onSubmit,
@@ -66,7 +67,8 @@ export default function MovieDialog({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      part: 1,
+      season: 1,
+      episode: 1,
       status: '',
     },
   });
@@ -75,7 +77,8 @@ export default function MovieDialog({
     if (open && defaultValues && mode === 'edit') {
       form.reset({
         name: defaultValues.name,
-        part: defaultValues.part,
+        season: defaultValues.season,
+        episode: defaultValues.episode,
         status: defaultValues.status,
       });
     }
@@ -104,12 +107,12 @@ export default function MovieDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="sm:text-center">
-            {mode === 'edit' ? 'Edit Movie' : 'Add Movie'}
+            {mode === 'edit' ? 'Edit Series' : 'Add Series'}
           </DialogTitle>
           <DialogDescription className=" text-center">
             {mode === 'edit'
-              ? 'Update your movie info'
-              : 'Add a movie to your watchlist'}
+              ? 'Update your series info'
+              : 'Add a series to your watchlist'}
           </DialogDescription>
 
           <Separator gradient className="mt-1" />
@@ -124,9 +127,9 @@ export default function MovieDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Movie</FormLabel>
+                  <FormLabel>Series</FormLabel>
                   <FormControl>
-                    <Input placeholder="Movie Name..." {...field} />
+                    <Input placeholder="Series Name..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,14 +138,32 @@ export default function MovieDialog({
 
             <FormField
               control={form.control}
-              name="part"
+              name="season"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Part</FormLabel>
+                  <FormLabel>Season</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Part number..."
+                      placeholder="Season Number..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="episode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Episode</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Episode Number..."
                       {...field}
                     />
                   </FormControl>

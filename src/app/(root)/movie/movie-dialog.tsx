@@ -142,7 +142,7 @@ export default function MovieDialog({
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Part number..."
+                      placeholder="Part Number..."
                       {...field}
                     />
                   </FormControl>

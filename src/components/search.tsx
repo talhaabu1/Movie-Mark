@@ -30,14 +30,22 @@ interface SearchItem {
 interface Props {
   placeholder: string;
   search: string;
+  status: string;
   setSearch: (value: string) => void;
   queryKey: string;
-  queryFn: (search: string) => Promise<SearchItem[]>;
+  queryFn: ({
+    search,
+    status,
+  }: {
+    search: string;
+    status: string;
+  }) => Promise<SearchItem[]>;
   setPage?: (value: number) => void;
 }
 
 const Search = ({
   search,
+  status,
   setSearch,
   queryKey,
   queryFn,
@@ -50,8 +58,8 @@ const Search = ({
   const debounced = useDebounce(query, 300);
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKey, debounced],
-    queryFn: () => queryFn(debounced),
+    queryKey: [queryKey, debounced, status],
+    queryFn: () => queryFn({ search: debounced, status }),
     staleTime: 1000 * 60 * 1,
     enabled: open,
   });

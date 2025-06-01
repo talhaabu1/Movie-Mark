@@ -4,52 +4,52 @@ import { Separator } from '@/components/indie/separator';
 import StatusSelect from '@/components/status-select';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { movieGet, moviePost, movieSearch } from '@/lib/api/movie';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { GeistMono } from 'geist/font/mono';
-import { useMovieStore } from '@/store/movieStore';
 import CustomPagination from '@/components/custom-pagination';
 import Search from '@/components/search';
-import type { MovieCreateInput } from '@/types/movie';
-import MovieTable from '../movie/movie-table';
-import MovieDialog from './movie-dialog';
+import SeriesTable from './series-table';
+import SeriesDialog from './series-dialog';
+import type { SeriesCreateInput } from '@/types/series';
+import { seriesGet, seriesPost, seriesSearch } from '@/lib/api/series';
+import { useSeriesStore } from '@/store/seriesStore';
 
 const Page = () => {
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
 
-  // movie store
+  // series store
   const { status, setStatus, page, setPage, setSearch, search } =
-    useMovieStore();
+    useSeriesStore();
 
   // user session
   const { data: session } = useSession();
   const userId = Number(session?.user?.id);
 
-  // movie mutation
-  const moviePostMutation = useMutation({
-    mutationFn: async (data: MovieCreateInput) => moviePost(data),
+  // series mutation
+  const seriesPostMutation = useMutation({
+    mutationFn: (data: SeriesCreateInput) => seriesPost(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['movie'] });
-      queryClient.invalidateQueries({ queryKey: ['search'] });
-      toast.success('Movie added successfully!', {
+      queryClient.invalidateQueries({ queryKey: ['series'] });
+      queryClient.invalidateQueries({ queryKey: ['seriesSearch'] });
+      toast.success('Series added successfully!', {
         className: `${GeistMono.className}`,
       });
     },
     onError: (err) => {
-      toast.error('Failed to add movie!', {
+      toast.error('Failed to add series!', {
         className: `${GeistMono.className}`,
       });
       console.error(err);
     },
   });
 
-  // movie get
+  // series get
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['movie', userId, status, page, search],
-    queryFn: () => movieGet({ userId, status, page, limit: 10, search }),
+    queryKey: ['series', userId, status, page, search],
+    queryFn: () => seriesGet({ userId, status, page, limit: 10, search }),
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
@@ -59,10 +59,13 @@ const Page = () => {
       <section className=" flex items-center gap-x-2 mt-3 mx-2 md:mx-0">
         <Search
           search={search}
+          status={status}
           setSearch={setSearch}
-          placeholder="Movie Name..."
-          queryKey="search"
-          queryFn={(search) => movieSearch({ search, userId })}
+          placeholder="Series Name..."
+          queryKey="seriesSearch"
+          queryFn={({ search, status }) =>
+            seriesSearch({ search, userId, status })
+          }
           setPage={setPage}
         />
         <StatusSelect
@@ -72,12 +75,12 @@ const Page = () => {
           setPage={setPage}
           allOptions
         />
-        <MovieDialog
+        <SeriesDialog
           open={open}
           setOpen={setOpen}
           mode="create"
           onSubmit={(data, { reset }) => {
-            moviePostMutation.mutate(
+            seriesPostMutation.mutate(
               {
                 ...data,
                 userId,
@@ -89,11 +92,11 @@ const Page = () => {
               }
             );
           }}
-          isLoading={moviePostMutation.isPending}
+          isLoading={seriesPostMutation.isPending}
         />
       </section>
       <Separator gradient className="my-3" />
-      <MovieTable
+      <SeriesTable
         data={data?.data}
         isLoading={isLoading}
         isFetching={isFetching}

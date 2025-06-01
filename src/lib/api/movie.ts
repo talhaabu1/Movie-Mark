@@ -32,12 +32,14 @@ export const movieGet = async (params: MovieGetParams) => {
 export const movieSearch = async ({
   search,
   userId,
-}: Pick<MovieGetParams, 'search' | 'userId'>) => {
+  status,
+}: Pick<MovieGetParams, 'search' | 'userId' | 'status'>) => {
   try {
     const res = await api.get('/movie/search', {
       params: {
         search,
         userId,
+        status,
       },
     });
     return res.data;

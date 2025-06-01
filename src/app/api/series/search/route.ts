@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { movieTable } from '@/db/schema';
+import { seriesTable } from '@/db/schema';
 import { isValidStatus } from '@/types/enum';
 import { and, eq, ilike } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
@@ -14,22 +14,22 @@ export async function GET(req: Request) {
     const where = [];
 
     if (searchParam) {
-      where.push(ilike(movieTable.name, `%${searchParam}%`));
+      where.push(ilike(seriesTable.name, `%${searchParam}%`));
     }
 
     if (userIdParam) {
-      where.push(eq(movieTable.userId, Number(userIdParam)));
+      where.push(eq(seriesTable.userId, Number(userIdParam)));
     }
 
     if (statusParam && isValidStatus(statusParam)) {
-      where.push(eq(movieTable.status, statusParam));
+      where.push(eq(seriesTable.status, statusParam));
     }
 
     const filter = where.length ? and(...where) : undefined;
 
-    const movieName = await db.query.movieTable.findMany({
+    const seriesName = await db.query.seriesTable.findMany({
       where: filter,
-      orderBy: (movie, { asc }) => [asc(movie.createdAt)],
+      orderBy: (series, { asc }) => [asc(series.createdAt)],
       columns: {
         id: true,
         name: true,
@@ -37,12 +37,12 @@ export async function GET(req: Request) {
       limit: 5,
     });
 
-    return NextResponse.json(movieName);
+    return NextResponse.json(seriesName);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       {
-        error: 'Failed to get movie name',
+        error: 'Failed to get series name',
         status: 'error',
       },
       { status: 500 }

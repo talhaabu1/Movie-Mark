@@ -33,7 +33,7 @@ const Page = () => {
     mutationFn: async (data: MovieCreateInput) => moviePost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movie'] });
-      queryClient.invalidateQueries({ queryKey: ['search'] });
+      queryClient.invalidateQueries({ queryKey: ['movieSearch'] });
       toast.success('Movie added successfully!', {
         className: `${GeistMono.className}`,
       });
@@ -60,9 +60,12 @@ const Page = () => {
         <Search
           search={search}
           setSearch={setSearch}
+          status={status}
           placeholder="Movie Name..."
-          queryKey="search"
-          queryFn={(search) => movieSearch({ search, userId })}
+          queryKey="movieSearch"
+          queryFn={({ search, status }) =>
+            movieSearch({ search, userId, status })
+          }
           setPage={setPage}
         />
         <StatusSelect
