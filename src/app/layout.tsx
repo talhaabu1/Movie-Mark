@@ -5,9 +5,9 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ViewTransitions } from 'next-view-transitions';
 import { SessionProvider } from 'next-auth/react';
-import { auth } from '@/auth';
 import { Toaster } from '@/components/ui/sonner';
 import TanstackProvider from '@/components/query-client-provider';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
   title: 'Movie Mark',

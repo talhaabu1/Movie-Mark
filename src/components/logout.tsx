@@ -16,10 +16,10 @@ const Logout = () => {
 
   const isDark = theme === 'dark';
 
-  if (!mounted) return null; // অথবা skeleton/spinner দিতে পারো
+  if (!mounted) return null;
 
   return (
-    <div className="max-w-xs w-full flex gap-x-3.5">
+    <div className="max-w-xs w-full flex gap-x-3.5 ">
       <Button
         onClick={() => setTheme(isDark ? 'light' : 'dark')}
         className="w-full"
