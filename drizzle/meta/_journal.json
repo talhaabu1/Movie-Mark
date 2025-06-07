@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1747944183885,
-      "tag": "0000_careful_maestro",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1748546701034,
-      "tag": "0001_tan_doctor_spectrum",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1748546863640,
-      "tag": "0002_thin_baron_strucker",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1748547135612,
-      "tag": "0003_sturdy_rawhide_kid",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1748615323473,
-      "tag": "0004_broken_otto_octavius",
+      "when": 1749321119843,
+      "tag": "0000_panoramic_jack_flag",
       "breakpoints": true
     }
   ]

@@ -54,8 +54,7 @@ const StatusReport = () => {
           <ScrollBar orientation="horizontal" className="mt-2" />
         </ScrollArea>
       </div>
-      <Separator gradient className="my-3" />
-      <div>
+      <div className=" mt-3">
         <h1>Series</h1>
         <ScrollArea className="w-full pb-4 mt-1">
           <div className="flex gap-2.5">

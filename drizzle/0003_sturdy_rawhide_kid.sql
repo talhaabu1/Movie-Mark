@@ -1,1 +1,0 @@
-ALTER TABLE "movie" DROP CONSTRAINT "movie_name_unique";
