@@ -5,7 +5,6 @@ import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import { Card, CardContent } from './ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { profileGet } from '@/lib/api/profile';
-import { Separator } from './indie/separator';
 import { Skeleton } from './ui/skeleton';
 import { cn, getStatusColor } from '@/lib/utils';
 
