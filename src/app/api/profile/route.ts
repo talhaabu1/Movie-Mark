@@ -1,68 +1,83 @@
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { movieTable } from '@/db/schema';
+import { movieTable, seriesTable } from '@/db/schema';
+import { isValidStatus } from '@/types/enum';
 import { and, count, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
+type TableType = typeof movieTable | typeof seriesTable;
+
+async function getCountByStatus(
+  table: TableType,
+  userId: number,
+  status?: string
+) {
+  const conditions = [eq(table.userId, userId)];
+
+  if (status && isValidStatus(status)) {
+    conditions.push(eq(table.status, status));
+  }
+
+  return db
+    .select({ count: count() })
+    .from(table)
+    .where(and(...conditions));
+}
+
+// 📦 API handler
 export async function GET() {
   const session = await auth();
-
   const userId = Number(session?.user?.id);
 
-  const [total, watched, watching, planToWatch, comingSoon] = await Promise.all(
-    [
-      // 🎬 Total movies added by user
-      db
-        .select({ count: count() })
-        .from(movieTable)
-        .where(eq(movieTable.userId, userId)),
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-      // ✅ Movies marked as 'WATCHED'
-      db
-        .select({ count: count() })
-        .from(movieTable)
-        .where(
-          and(eq(movieTable.userId, userId), eq(movieTable.status, 'WATCHED'))
-        ),
+  // 🎬 Movie Stats
+  const [
+    totalMovies,
+    watchedMovies,
+    watchingMovies,
+    planToWatchMovies,
+    comingSoonMovies,
+  ] = await Promise.all([
+    getCountByStatus(movieTable, userId),
+    getCountByStatus(movieTable, userId, 'WATCHED'),
+    getCountByStatus(movieTable, userId, 'WATCHING'),
+    getCountByStatus(movieTable, userId, 'PLAN TO WATCH'),
+    getCountByStatus(movieTable, userId, 'COMING SOON'),
+  ]);
 
-      // 📺 Movies currently 'WATCHING'
-      db
-        .select({ count: count() })
-        .from(movieTable)
-        .where(
-          and(eq(movieTable.userId, userId), eq(movieTable.status, 'WATCHING'))
-        ),
+  // 📺 Series Stats
+  const [
+    totalSeries,
+    watchedSeries,
+    watchingSeries,
+    planToWatchSeries,
+    comingSoonSeries,
+  ] = await Promise.all([
+    getCountByStatus(seriesTable, userId),
+    getCountByStatus(seriesTable, userId, 'WATCHED'),
+    getCountByStatus(seriesTable, userId, 'WATCHING'),
+    getCountByStatus(seriesTable, userId, 'PLAN TO WATCH'),
+    getCountByStatus(seriesTable, userId, 'COMING SOON'),
+  ]);
 
-      // 📅 Movies planned to watch
-      db
-        .select({ count: count() })
-        .from(movieTable)
-        .where(
-          and(
-            eq(movieTable.userId, userId),
-            eq(movieTable.status, 'PLAN TO WATCH')
-          )
-        ),
-
-      // 🚀 Upcoming movies marked as 'COMING SOON'
-      db
-        .select({ count: count() })
-        .from(movieTable)
-        .where(
-          and(
-            eq(movieTable.userId, userId),
-            eq(movieTable.status, 'COMING SOON')
-          )
-        ),
-    ]
-  );
-
-  // 📦 Return the aggregated counts as JSON response
+  // 📊 Build Response
   return NextResponse.json({
-    total: total[0]?.count ?? 0,
-    watched: watched[0]?.count ?? 0,
-    watching: watching[0]?.count ?? 0,
-    planToWatch: planToWatch[0]?.count ?? 0,
-    comingSoon: comingSoon[0]?.count ?? 0,
+    movie: [
+      { total: totalMovies[0]?.count ?? 0, name: 'ALL' },
+      { total: watchedMovies[0]?.count ?? 0, name: 'WATCHED' },
+      { total: watchingMovies[0]?.count ?? 0, name: 'WATCHING' },
+      { total: planToWatchMovies[0]?.count ?? 0, name: 'PLAN TO WATCH' },
+      { total: comingSoonMovies[0]?.count ?? 0, name: 'COMING SOON' },
+    ],
+    series: [
+      { total: totalSeries[0]?.count ?? 0, name: 'ALL' },
+      { total: watchedSeries[0]?.count ?? 0, name: 'WATCHED' },
+      { total: watchingSeries[0]?.count ?? 0, name: 'WATCHING' },
+      { total: planToWatchSeries[0]?.count ?? 0, name: 'PLAN TO WATCH' },
+      { total: comingSoonSeries[0]?.count ?? 0, name: 'COMING SOON' },
+    ],
   });
 }

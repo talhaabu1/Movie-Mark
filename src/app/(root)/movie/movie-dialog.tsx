@@ -72,14 +72,14 @@ export default function MovieDialog({
   });
 
   useEffect(() => {
-    if (open && defaultValues && mode === 'edit') {
+    if (open && mode === 'edit') {
       form.reset({
         name: defaultValues.name,
         part: defaultValues.part,
         status: defaultValues.status,
       });
     }
-  }, [open, mode]);
+  }, [open, mode, form]);
 
   const handleSubmit = (values: FormDataType) => {
     onSubmit(values, {
