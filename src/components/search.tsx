@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/popover';
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
+import { Skeleton } from './ui/skeleton';
 
 interface SearchItem {
   id: number;
@@ -61,7 +62,7 @@ const Search = ({
     queryKey: [queryKey, debounced, status],
     queryFn: () => queryFn({ search: debounced, status }),
     staleTime: 1000 * 60 * 1,
-    enabled: open,
+    enabled: debounced.length >= 1,
   });
 
   return (
@@ -74,6 +75,7 @@ const Search = ({
               variant="outline"
               role="combobox"
               aria-expanded={open}
+              aria-label="Search dropdown"
               className="bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]">
               <div className="flex items-center justify-between w-full">
                 <span
@@ -119,31 +121,41 @@ const Search = ({
               onValueChange={setQuery}
             />
             <CommandList>
-              {isLoading ? (
-                <p className="py-6 text-center text-sm">Loading...</p>
-              ) : (
+              {isLoading && (
+                <>
+                  <div className="space-y-3 px-2 py-2">
+                    <Skeleton className="h-[32px] w-full" />
+                    <Skeleton className="h-[32px] w-full" />
+                    <Skeleton className="h-[32px] w-full" />
+                  </div>
+                </>
+              )}
+
+              {debounced.length >= 1 && !isLoading && (
                 <CommandEmpty>No results found.</CommandEmpty>
               )}
 
-              <CommandGroup>
-                {data?.map((item) => (
-                  <CommandItem
-                    key={item.id}
-                    value={item.name}
-                    onSelect={(currentValue) => {
-                      const newValue =
-                        currentValue === search ? '' : currentValue;
-                      setSearch(newValue);
-                      setOpen(false);
-                      setPage?.(1);
-                    }}>
-                    {item.name}
-                    {search === item.name && (
-                      <CheckIcon size={16} className="ml-auto" />
-                    )}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              {data && data.length > 0 && (
+                <CommandGroup>
+                  {data?.map((item) => (
+                    <CommandItem
+                      key={item.id}
+                      value={item.name}
+                      onSelect={(currentValue) => {
+                        const newValue =
+                          currentValue === search ? '' : currentValue;
+                        setSearch(newValue);
+                        setOpen(false);
+                        setPage?.(1);
+                      }}>
+                      {item.name}
+                      {search === item.name && (
+                        <CheckIcon size={16} className="ml-auto" />
+                      )}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
             </CommandList>
           </Command>
         </PopoverContent>
