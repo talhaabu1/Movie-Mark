@@ -31,11 +31,8 @@ const BottomNavigation = () => {
             <Link
               href={item.href}
               onClick={handleClick}
-              className={cn(
-                'flex flex-col gap-y-1 items-center',
-                isActive && 'text-primary'
-              )}>
-              <item.icon />
+              className={cn('flex flex-col gap-y-1 items-center')}>
+              <item.icon className={cn(isActive && 'stroke-primary')} />
               {item.title}
             </Link>
           </li>
